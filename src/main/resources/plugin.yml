@@ -1,0 +1,36 @@
+name: KawaiiAD
+version: 1.0.0
+main: dev.oumaimaa.KawaiiAdPlugin
+api-version: 1.20
+authors: [ oumaimaa ]
+description: A confirmation-based advertisement plugin with rank cooldowns and PAPI support.
+depend: [ PlaceholderAPI ]
+softdepend: [ RedisBungee ]
+commands:
+  ads:
+    description: Previews and confirms a server-wide advertisement.
+    usage: /ads <message>
+    permission: kawaiid.use
+  kawaiiadshelp:
+    description: Displays the rich help menu for KawaiiAD.
+    usage: /kawaiiadshelp
+    permission: kawaiid.use
+permissions:
+  kawaiid.use:
+    description: Allows using the /ads command.
+    default: op
+  kawaiid.bypass:
+    description: Bypasses the cooldown check.
+    default: op
+  kawaiid.admin:
+    description: Full access, including /ads reload and /ads broadcast.
+    default: op
+  kawaiid.cooldown.vip:
+    description: Gives the VIP cooldown (e.g., 60s)
+    default: false
+  kawaiid.cooldown.donor:
+    description: Gives the Donor cooldown (e.g., 120s)
+    default: false
+  kawaiid.broadcast.world:
+    description: Allows use of the /ads broadcast world command.
+    default: op

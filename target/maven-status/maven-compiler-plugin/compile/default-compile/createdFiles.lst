@@ -1,0 +1,9 @@
+dev\oumaimaa\commands\AdsCommand$1.class
+dev\oumaimaa\data\DatabaseManager.class
+dev\oumaimaa\KawaiiAdPlugin.class
+dev\oumaimaa\commands\AdsCommand.class
+dev\oumaimaa\papi\Placeholder.class
+dev\oumaimaa\data\CooldownManager.class
+dev\oumaimaa\commands\AdsTabCompleter.class
+dev\oumaimaa\config\AdsConfigManager.class
+dev\oumaimaa\commands\HelpCommand.class

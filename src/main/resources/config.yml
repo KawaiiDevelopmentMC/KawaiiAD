@@ -1,0 +1,41 @@
+settings:
+  debug-mode: false
+
+cooldowns:
+  default: 300
+  ranks:
+    vip: 60
+    donor: 120
+
+confirmation-timeout-seconds: 60
+
+moderation:
+  min-length: 10
+  max-length: 150
+  profanity-filter:
+    - "badword"
+    - "anotherbadword"
+
+broadcast-sound:
+  key: "minecraft:entity.experience_orb.pickup"
+  volume: 1.0
+  pitch: 1.5
+
+messages:
+  no-permission: "&cYou do not have permission to use this command."
+  cooldown-bypass: "&aCooldown bypassed (kawaiid.bypass)."
+  on-cooldown: "&cYou must wait <time_remaining> before sending another ad."
+
+  preview-header: "&6&l--- Ad Preview ---"
+  preview-ad-prefix: "&7[AD] &f"
+  preview-footer: "&6&l------------------"
+
+  ad-broadcasted: "&aAdvertisement successfully broadcasted!"
+  ad-cancelled: "&eYour pending ad has been cancelled."
+  ad-timeout: "&cYour pending ad request timed out."
+  ad-already-pending: "&cYou already have a pending ad. Type /ads confirm or /ads cancel."
+  usage: "&cUsage: /ads <message>"
+
+  error-too-short: "&cError: Advertisement must be at least %min% characters long."
+  error-too-long: "&cError: Advertisement must be no more than %max% characters long."
+  error-profanity: "&cError: Advertisement contains blacklisted words."
