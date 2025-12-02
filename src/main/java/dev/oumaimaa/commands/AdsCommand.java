@@ -17,12 +17,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Command executor for the /ads command.
@@ -30,20 +30,20 @@ import java.util.stream.Collectors;
  */
 public final class AdsCommand implements CommandExecutor {
 
-    private static final String ADMIN_PERMISSION = "kawaiid.admin";
-    private static final String USE_PERMISSION = "kawaiid.use";
-    private static final String BROADCAST_WORLD_PERMISSION = "kawaiid.broadcast.world";
-    private static final String BYPASS_PERMISSION = "kawaiid.bypass";
-    private static final String REVIEW_PERMISSION = "kawaiid.review";
     private final KawaiiAdPlugin plugin;
     private final AdsConfigManager configManager;
     private final CooldownManager cooldownManager;
     private final Map<UUID, String> pendingAds;
     private final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder().character('&').hexColors().build();
 
+    private static final String ADMIN_PERMISSION = "kawaiid.admin";
+    private static final String USE_PERMISSION = "kawaiid.use";
+    private static final String BROADCAST_WORLD_PERMISSION = "kawaiid.broadcast.world";
+    private static final String BYPASS_PERMISSION = "kawaiid.bypass";
+    private static final String REVIEW_PERMISSION = "kawaiid.review";
+
     /**
      * Constructs the AdsCommand executor.
-     *
      * @param plugin The main plugin instance.
      */
     public AdsCommand(final @NotNull KawaiiAdPlugin plugin) {
@@ -171,7 +171,7 @@ public final class AdsCommand implements CommandExecutor {
     /**
      * Handles the /ads broadcast command for staff.
      */
-    private boolean handleBroadcastCommand(final @NotNull CommandSender sender, final String[] args) {
+    private boolean handleBroadcastCommand(final CommandSender sender, final String[] args) {
         if (!sender.hasPermission(ADMIN_PERMISSION)) {
             sender.sendMessage(configManager.getCachedNoPermission());
             return true;
@@ -210,7 +210,7 @@ public final class AdsCommand implements CommandExecutor {
     /**
      * Finalizes the advertisement broadcast, applies cooldown, and removes the pending ad.
      */
-    private boolean handleConfirm(final @NotNull Player player) {
+    private boolean handleConfirm(final Player player) {
         final UUID playerUUID = player.getUniqueId();
         final String adMessageRaw = pendingAds.remove(playerUUID);
 
@@ -221,10 +221,12 @@ public final class AdsCommand implements CommandExecutor {
 
         final Component broadcastMessage = formatAdMessage(player, adMessageRaw);
 
-        // FIX: Explicitly combine Console and the Player collection (List<Player>) into a single Audience.
+        // --- FINAL FIX: Combine Console and Player collection using Stream.concat ---
         final Audience allRecipients = Audience.audience(
-                Bukkit.getConsoleSender(),
-                (Audience) Bukkit.getOnlinePlayers().stream().collect(Collectors.toList())
+                Stream.concat(
+                        Stream.of(Bukkit.getConsoleSender()), // Console Sender
+                        Bukkit.getOnlinePlayers().stream()     // All Players
+                ).collect(Collectors.toList())
         );
 
         allRecipients.sendMessage(broadcastMessage);
@@ -243,7 +245,7 @@ public final class AdsCommand implements CommandExecutor {
     /**
      * Handles the /ads cancel command.
      */
-    private boolean handleCancel(final @NotNull Player player) {
+    private boolean handleCancel(final Player player) {
         if (pendingAds.remove(player.getUniqueId()) != null) {
             player.sendMessage(configManager.getCachedAdCancelled());
             if (configManager.isDebugEnabled()) {
@@ -258,7 +260,7 @@ public final class AdsCommand implements CommandExecutor {
     /**
      * Handles the /ads reload command.
      */
-    private boolean handleReload(final @NotNull CommandSender sender) {
+    private boolean handleReload(final CommandSender sender) {
         plugin.reloadConfig();
         plugin.getAdsConfigManager().setupConfig();
         sender.sendMessage(Component.text("KawaiiAD configuration reloaded.", NamedTextColor.GREEN));
@@ -271,7 +273,7 @@ public final class AdsCommand implements CommandExecutor {
     /**
      * Applies PAPI expansion and formatting to the raw message.
      */
-    private @NotNull Component formatAdMessage(final CommandSender sender, final String adMessageRaw) {
+    private Component formatAdMessage(final CommandSender sender, final String adMessageRaw) {
         final Component adPrefix = configManager.getCachedAdPrefix();
         String processedMessage = adMessageRaw;
 
@@ -299,7 +301,7 @@ public final class AdsCommand implements CommandExecutor {
         sender.sendMessage(Component.text("Broadcasted to world: " + worldName, NamedTextColor.GREEN));
     }
 
-    private void handlePermissionBroadcast(final @NotNull CommandSender sender, final String permission, final Component message) {
+    private void handlePermissionBroadcast(final CommandSender sender, final String permission, final Component message) {
         Bukkit.getOnlinePlayers().stream()
                 .filter(p -> p.hasPermission(permission))
                 .forEach(p -> p.sendMessage(message));
@@ -307,7 +309,7 @@ public final class AdsCommand implements CommandExecutor {
         sender.sendMessage(Component.text("Broadcasted to players with permission: " + permission, NamedTextColor.GREEN));
     }
 
-    private @Nullable String validateAdMessage(final @NotNull String message) {
+    private String validateAdMessage(final String message) {
         final int minChars = configManager.getMinLength();
         final int maxChars = configManager.getMaxLength();
 
@@ -329,7 +331,7 @@ public final class AdsCommand implements CommandExecutor {
         return null;
     }
 
-    private void sendAdPreview(final @NotNull Player player, final String adMessageRaw) {
+    private void sendAdPreview(final Player player, final String adMessageRaw) {
         final long timeout = configManager.getConfirmationTimeoutSeconds();
 
         player.sendMessage(configManager.getCachedPreviewHeader());
