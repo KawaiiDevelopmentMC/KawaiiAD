@@ -220,7 +220,12 @@ public final class AdsCommand implements CommandExecutor {
         }
 
         final Component broadcastMessage = formatAdMessage(player, adMessageRaw);
-        final Audience allRecipients = Audience.audience(Bukkit.getConsoleSender(), (Audience) Bukkit.getOnlinePlayers().stream().collect(Collectors.toList()));
+
+        // FIX: Explicitly combine Console and the Player collection (List<Player>) into a single Audience.
+        final Audience allRecipients = Audience.audience(
+                Bukkit.getConsoleSender(),
+                (Audience) Bukkit.getOnlinePlayers().stream().collect(Collectors.toList())
+        );
 
         allRecipients.sendMessage(broadcastMessage);
         allRecipients.playSound(configManager.getBroadcastSound());
